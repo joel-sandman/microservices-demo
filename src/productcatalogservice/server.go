@@ -27,6 +27,10 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	/* ------------------------- NEW CODE ------------------------- */
+	"encoding/json"
+	"math/rand"
+	/* ------------------------------------------------------------ */
 
 	pb "github.com/GoogleCloudPlatform/microservices-demo/src/productcatalogservice/genproto"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -75,6 +79,9 @@ func init() {
 }
 
 func main() {
+	/* ------------------------- NEW CODE ------------------------- */
+	go updateProductList()
+	/* ------------------------------------------------------------ */
 	if os.Getenv("DISABLE_TRACING") == "" {
 		log.Info("Tracing enabled.")
 		go initTracing()
@@ -297,3 +304,57 @@ func (p *productCatalog) SearchProducts(ctx context.Context, req *pb.SearchProdu
 	}
 	return &pb.SearchProductsResponse{Results: ps}, nil
 }
+
+/* ------------------------- NEW CODE ------------------------- */
+
+type Products struct {
+	Products	[]Product	`json:"products"`
+}
+
+type Product struct {
+	ID				string		`json:"id"`
+	Name			string		`json:"name"`
+	Description		string		`json:"description"`
+	Picture			string		`json:"picture"`
+	PriceUSD		Price		`json:"priceUsd"`
+	Categories		[]string	`json:"categories"`
+}
+
+type Price struct {
+	CurrencyCode	string	`json:"currencyCode"`
+	Units			int		`json:"units"`
+	Nanos			int		`json:"nanos"`
+}
+
+func updateProductList() {
+	rand.Seed(time.Now().UTC().UnixNano())
+	for {
+		time.Sleep(10 * time.Second)
+		catalogJSON, _ := ioutil.ReadFile("products.json")
+
+		var products Products
+		if err := json.Unmarshal(catalogJSON, &products); err != nil {
+			panic(err)
+		}
+
+		ProductIndex := rand.Intn(8)
+		price := products.Products[ProductIndex].PriceUSD.Units
+		price += 1
+		products.Products[ProductIndex].PriceUSD.Units = price
+
+		newCatalogJSON, _ := json.MarshalIndent(products, "", "    ")
+		ioutil.WriteFile("products.json", newCatalogJSON, 0664)
+		reloadCatalog = true
+
+		newnewCatalogJSON, _ := ioutil.ReadFile("products.json")
+		var products2 Products
+		if err := json.Unmarshal(newnewCatalogJSON, &products2); err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("%+v\n", products.Products[ProductIndex].Name)
+		fmt.Printf("%+v\n", products.Products[ProductIndex].PriceUSD.Units)
+	}
+}
+
+/* ------------------------------------------------------------ */

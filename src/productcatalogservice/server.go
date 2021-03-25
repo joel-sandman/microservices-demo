@@ -338,22 +338,16 @@ func updateProductList() {
 		}
 
 		ProductIndex := rand.Intn(8)
-		price := products.Products[ProductIndex].PriceUSD.Units
-		price += 1
-		products.Products[ProductIndex].PriceUSD.Units = price
+		currentPrice := products.Products[ProductIndex].PriceUSD.Units
+		newPrice := currentPrice + 1
+		products.Products[ProductIndex].PriceUSD.Units = newPrice
 
 		newCatalogJSON, _ := json.MarshalIndent(products, "", "    ")
 		ioutil.WriteFile("products.json", newCatalogJSON, 0664)
 		reloadCatalog = true
 
-		newnewCatalogJSON, _ := ioutil.ReadFile("products.json")
-		var products2 Products
-		if err := json.Unmarshal(newnewCatalogJSON, &products2); err != nil {
-			panic(err)
-		}
-
-		fmt.Printf("%+v\n", products.Products[ProductIndex].Name)
-		fmt.Printf("%+v\n", products.Products[ProductIndex].PriceUSD.Units)
+		// fmt.Printf("%+v\n", products.Products[ProductIndex].Name)
+		// fmt.Printf("%+v\n", products.Products[ProductIndex].PriceUSD.Units)
 	}
 }
 

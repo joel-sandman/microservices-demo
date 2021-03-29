@@ -14,40 +14,40 @@
  * limitations under the License.
  */
 
-if(process.env.DISABLE_PROFILER) {
-  console.log("Profiler disabled.")
-}
-else {
-  console.log("Profiler enabled.")
-  require('@google-cloud/profiler').start({
-    serviceContext: {
-      service: 'currencyservice',
-      version: '1.0.0'
-    }
-  });
-}
+// if(process.env.DISABLE_PROFILER) {
+//   console.log("Profiler disabled.")
+// }
+// else {
+//   console.log("Profiler enabled.")
+//   require('@google-cloud/profiler').start({
+//     serviceContext: {
+//       service: 'currencyservice',
+//       version: '1.0.0'
+//     }
+//   });
+// }
 
 
-if(process.env.DISABLE_TRACING) {
-  console.log("Tracing disabled.")
-}
-else {
-  console.log("Tracing enabled.")
-  require('@google-cloud/trace-agent').start();
-}
+// if(process.env.DISABLE_TRACING) {
+//   console.log("Tracing disabled.")
+// }
+// else {
+//   console.log("Tracing enabled.")
+//   require('@google-cloud/trace-agent').start();
+// }
 
-if(process.env.DISABLE_DEBUGGER) {
-  console.log("Debugger disabled.")
-}
-else {
-  console.log("Debugger enabled.")
-  require('@google-cloud/debug-agent').start({
-    serviceContext: {
-      service: 'currencyservice',
-      version: 'VERSION'
-    }
-  });
-}
+// if(process.env.DISABLE_DEBUGGER) {
+//   console.log("Debugger disabled.")
+// }
+// else {
+//   console.log("Debugger enabled.")
+//   require('@google-cloud/debug-agent').start({
+//     serviceContext: {
+//       service: 'currencyservice',
+//       version: 'VERSION'
+//     }
+//   });
+// }
 
 const path = require('path');
 const grpc = require('grpc');
@@ -57,7 +57,8 @@ const protoLoader = require('@grpc/proto-loader');
 const MAIN_PROTO_PATH = path.join(__dirname, './proto/demo.proto');
 const HEALTH_PROTO_PATH = path.join(__dirname, './proto/grpc/health/v1/health.proto');
 
-const PORT = process.env.PORT;
+// const PORT = process.env.PORT;
+const PORT = 7000
 
 const shopProto = _loadProto(MAIN_PROTO_PATH).hipstershop;
 const healthProto = _loadProto(HEALTH_PROTO_PATH).grpc.health.v1;
@@ -90,10 +91,25 @@ function _loadProto (path) {
  * Helper function that gets currency data from a stored JSON file
  * Uses public data from European Central Bank
  */
+// function _getCurrencyData (callback) {
+//   const data = require('./data/currency_conversion.json');
+//   callback(data);
+// }
+
+/* ------------------------- NEW CODE ------------------------- */
+
 function _getCurrencyData (callback) {
-  const data = require('./data/currency_conversion.json');
-  callback(data);
+  const fs = require('fs');
+
+  fs.readFile('./data/currency_conversion.json', (err, data) => {
+      if (err) throw err;
+      let currencyData = JSON.parse(data);
+      console.log(currencyData);
+      callback(currencyData);
+  });
 }
+
+/* ------------------------------------------------------------ */
 
 /**
  * Helper function that handles decimal/fractional carrying
@@ -160,6 +176,37 @@ function check (call, callback) {
   callback(null, { status: 'SERVING' });
 }
 
+/* ------------------------- NEW CODE ------------------------- */
+
+async function updateCurrencyConversionRates() {
+  const fs = require('fs');
+  var loop = true;
+  while (loop) {
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
+    fs.readFile('./data/currency_conversion.json', (err, data) => {
+        if (err) throw err;
+        let currencyData = JSON.parse(data);
+        for (let i in currencyData) {
+          if (i == "EUR") {
+            continue;
+          }
+
+          let factor = Math.random() * (1.01 - 0.99) + 0.99;
+          newRate = currencyData[i] * factor;
+          currencyData[i] = newRate.toFixed(4).toString(10);
+        }
+
+        let newCurrencyData = JSON.stringify(currencyData, null, 2);
+        fs.writeFile('./data/currency_conversion.json', newCurrencyData, (err) => {
+          if (err) throw err;
+        });
+    });
+  }
+}
+
+/* ------------------------------------------------------------ */
+
 /**
  * Starts an RPC server that receives requests for the
  * CurrencyConverter service at the sample server port
@@ -170,6 +217,11 @@ function main () {
   server.addService(shopProto.CurrencyService.service, {getSupportedCurrencies, convert});
   server.addService(healthProto.Health.service, {check});
   server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
+
+  /* ------------------------- NEW CODE ------------------------- */
+  updateCurrencyConversionRates();
+  /* ------------------------------------------------------------ */
+
   server.start();
 }
 

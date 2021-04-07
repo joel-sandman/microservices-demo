@@ -240,8 +240,8 @@ func initProfiling(service, version string) {
 type productCatalog struct{}
 
 func readCatalogFile(catalog *pb.ListProductsResponse) error {
-	catalogMutex.Lock()
-	defer catalogMutex.Unlock()
+	// catalogMutex.Lock()
+	// defer catalogMutex.Unlock()
 	catalogJSON, err := ioutil.ReadFile("products.json")
 	if err != nil {
 		log.Fatalf("failed to open product catalog json file: %v", err)
@@ -256,6 +256,10 @@ func readCatalogFile(catalog *pb.ListProductsResponse) error {
 }
 
 func parseCatalog() []*pb.Product {
+	/* ------------------------- NEW CODE ------------------------- */
+	catalogMutex.Lock()
+	defer catalogMutex.Unlock()
+	/* ------------------------------------------------------------ */
 	if reloadCatalog || len(cat.Products) == 0 {
 		err := readCatalogFile(&cat)
 		if err != nil {
@@ -330,6 +334,7 @@ func updateProductList() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	for {
 		time.Sleep(10 * time.Second)
+		catalogMutex.Lock()
 		catalogJSON, _ := ioutil.ReadFile("products.json")
 
 		var products Products
@@ -337,7 +342,7 @@ func updateProductList() {
 			panic(err)
 		}
 
-		ProductIndex := rand.Intn(8)
+		ProductIndex := rand.Intn(9)
 		currentPrice := products.Products[ProductIndex].PriceUSD.Units
 		newPrice := currentPrice + 1
 		products.Products[ProductIndex].PriceUSD.Units = newPrice
@@ -346,8 +351,7 @@ func updateProductList() {
 		ioutil.WriteFile("products.json", newCatalogJSON, 0664)
 		reloadCatalog = true
 
-		// fmt.Printf("%+v\n", products.Products[ProductIndex].Name)
-		// fmt.Printf("%+v\n", products.Products[ProductIndex].PriceUSD.Units)
+		catalogMutex.Unlock()
 	}
 }
 

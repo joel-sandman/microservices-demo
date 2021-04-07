@@ -101,17 +101,17 @@ spec:
           - name: PORT
             value: "5050"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
-            value: "productcatalogservice:3550"
+            value: "localhost:1234"
           - name: SHIPPING_SERVICE_ADDR
-            value: "shippingservice:50051"
+            value: "localhost:1234"
           - name: PAYMENT_SERVICE_ADDR
-            value: "paymentservice:50051"
+            value: "localhost:1234"
           - name: EMAIL_SERVICE_ADDR
-            value: "emailservice:5000"
+            value: "localhost:1234"
           - name: CURRENCY_SERVICE_ADDR
-            value: "currencyservice:7000"
+            value: "localhost:1234"
           - name: CART_SERVICE_ADDR
-            value: "cartservice:7070"
+            value: "localhost:1234"
           - name: DISABLE_STATS
             value: "1"
           - name: DISABLE_TRACING
@@ -127,6 +127,30 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
+        - name: caching-grpc-reverse-proxy
+          image: caching-grpc-reverse-proxy:latest
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 1234
+          env:
+          - name: PROXY_LISTEN_PORT
+            value: "1234"
+          - name: TTL
+            value: "10000"
+          - name: PRODUCT_CATALOG_SERVICE_ADDR
+            value: "productcatalogservice:3550"
+          - name: SHIPPING_SERVICE_ADDR
+            value: "shippingservice:50051"
+          - name: PAYMENT_SERVICE_ADDR
+            value: "paymentservice:50051"
+          - name: EMAIL_SERVICE_ADDR
+            value: "emailservice:5000"
+          - name: CURRENCY_SERVICE_ADDR
+            value: "currencyservice:7000"
+          - name: CART_SERVICE_ADDR
+            value: "cartservice:7070"
+          - name: PROXY_CACHE_BLACKLIST
+            value: "(AddItem|EmptyCart|ShipOrder|SendOrderConfirmation|PlaceOrder|Charge)"
 ---
 apiVersion: v1
 kind: Service
@@ -173,7 +197,7 @@ spec:
         - name: PORT
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: "productcatalogservice:3550"
+          value: "localhost:1234"
         - name: DISABLE_TRACING
           value: "1"
         - name: DISABLE_PROFILER
@@ -187,6 +211,20 @@ spec:
           limits:
             cpu: 200m
             memory: 450Mi
+      - name: caching-grpc-reverse-proxy
+        image: caching-grpc-reverse-proxy:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 1234
+        env:
+        - name: PROXY_LISTEN_PORT
+          value: "1234"
+        - name: TTL
+          value: "10000"
+        - name: PRODUCT_CATALOG_SERVICE_ADDR
+          value: "productcatalogservice:3550"
+        - name: PROXY_CACHE_BLACKLIST
+          value: "(AddItem|EmptyCart|ShipOrder|SendOrderConfirmation|PlaceOrder|Charge)"
 ---
 apiVersion: v1
 kind: Service
@@ -242,19 +280,19 @@ spec:
           - name: PORT
             value: "8080"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
-            value: "productcatalogservice:3550"
+            value: "localhost:1234"
           - name: CURRENCY_SERVICE_ADDR
-            value: "currencyservice:7000"
+            value: "localhost:1234"
           - name: CART_SERVICE_ADDR
-            value: "cartservice:7070"
+            value: "localhost:1234"
           - name: RECOMMENDATION_SERVICE_ADDR
-            value: "recommendationservice:8080"
+            value: "localhost:1234"
           - name: SHIPPING_SERVICE_ADDR
-            value: "shippingservice:50051"
+            value: "localhost:1234"
           - name: CHECKOUT_SERVICE_ADDR
-            value: "checkoutservice:5050"
+            value: "localhost:1234"
           - name: AD_SERVICE_ADDR
-            value: "adservice:9555"
+            value: "localhost:1234"
           - name: ENV_PLATFORM
             value: "gcp"
           - name: DISABLE_TRACING
@@ -270,6 +308,32 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
+        - name: caching-grpc-reverse-proxy
+          image: caching-grpc-reverse-proxy:latest
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 1234
+          env:
+          - name: PROXY_LISTEN_PORT
+            value: "1234"
+          - name: TTL
+            value: "10000"
+          - name: PRODUCT_CATALOG_SERVICE_ADDR
+            value: "productcatalogservice:3550"
+          - name: CURRENCY_SERVICE_ADDR
+            value: "currencyservice:7000"
+          - name: CART_SERVICE_ADDR
+            value: "cartservice:7070"
+          - name: RECOMMENDATION_SERVICE_ADDR
+            value: "recommendationservice:8080"
+          - name: SHIPPING_SERVICE_ADDR
+            value: "shippingservice:50051"
+          - name: CHECKOUT_SERVICE_ADDR
+            value: "checkoutservice:5050"
+          - name: AD_SERVICE_ADDR
+            value: "adservice:9555"
+          - name: PROXY_CACHE_BLACKLIST
+            value: "(AddItem|EmptyCart|ShipOrder|SendOrderConfirmation|PlaceOrder|Charge)"
 ---
 apiVersion: v1
 kind: Service
@@ -365,7 +429,7 @@ spec:
       containers:
       - name: server
         # image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.2
-        image: prod:latest
+        image: pcs:latest
         ports:
         - containerPort: 3550
         env:
@@ -513,7 +577,7 @@ spec:
       containers:
       - name: server
         # image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.2
-        image: curr:latest
+        image: cs:latest
         ports:
         - name: grpc
           containerPort: 7000

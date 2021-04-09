@@ -39,8 +39,8 @@ spec:
         env:
         - name: PORT
           value: "8080"
-        - name: DISABLE_TRACING
-          value: "1"
+        # - name: DISABLE_TRACING
+        #   value: "1"
         - name: DISABLE_PROFILER
           value: "1"
         readinessProbe:
@@ -101,43 +101,6 @@ spec:
           - name: PORT
             value: "5050"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: SHIPPING_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: PAYMENT_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: EMAIL_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: CURRENCY_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: CART_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: DISABLE_STATS
-            value: "1"
-          - name: DISABLE_TRACING
-            value: "1"
-          - name: DISABLE_PROFILER
-            value: "1"
-          # - name: JAEGER_SERVICE_ADDR
-          #   value: "jaeger-collector:14268"
-          resources:
-            requests:
-              cpu: 100m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 128Mi
-        - name: caching-grpc-reverse-proxy
-          image: caching-grpc-reverse-proxy:latest
-          imagePullPolicy: Never
-          ports:
-          - containerPort: 1234
-          env:
-          - name: PROXY_LISTEN_PORT
-            value: "1234"
-          - name: TTL
-            value: "10000"
-          - name: PRODUCT_CATALOG_SERVICE_ADDR
             value: "productcatalogservice:3550"
           - name: SHIPPING_SERVICE_ADDR
             value: "shippingservice:50051"
@@ -149,8 +112,21 @@ spec:
             value: "currencyservice:7000"
           - name: CART_SERVICE_ADDR
             value: "cartservice:7070"
-          - name: PROXY_CACHE_BLACKLIST
-            value: "(AddItem|EmptyCart|ShipOrder|SendOrderConfirmation|PlaceOrder|Charge)"
+          # - name: DISABLE_STATS
+          #   value: "1"
+          # - name: DISABLE_TRACING
+          #   value: "1"
+          # - name: DISABLE_PROFILER
+          #   value: "1"
+          # - name: JAEGER_SERVICE_ADDR
+          #   value: "jaeger-collector:14268"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
 ---
 apiVersion: v1
 kind: Service
@@ -197,13 +173,13 @@ spec:
         - name: PORT
           value: "8080"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: "localhost:1234"
-        - name: DISABLE_TRACING
-          value: "1"
-        - name: DISABLE_PROFILER
-          value: "1"
-        - name: DISABLE_DEBUGGER
-          value: "1"
+          value: "productcatalogservice:3550"
+        # - name: DISABLE_TRACING
+        #   value: "1"
+        # - name: DISABLE_PROFILER
+        #   value: "1"
+        # - name: DISABLE_DEBUGGER
+        #   value: "1"
         resources:
           requests:
             cpu: 100m
@@ -211,20 +187,6 @@ spec:
           limits:
             cpu: 200m
             memory: 450Mi
-      - name: caching-grpc-reverse-proxy
-        image: caching-grpc-reverse-proxy:latest
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 1234
-        env:
-        - name: PROXY_LISTEN_PORT
-          value: "1234"
-        - name: TTL
-          value: "10000"
-        - name: PRODUCT_CATALOG_SERVICE_ADDR
-          value: "productcatalogservice:3550"
-        - name: PROXY_CACHE_BLACKLIST
-          value: "(AddItem|EmptyCart|ShipOrder|SendOrderConfirmation|PlaceOrder|Charge)"
 ---
 apiVersion: v1
 kind: Service
@@ -280,45 +242,6 @@ spec:
           - name: PORT
             value: "8080"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: CURRENCY_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: CART_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: RECOMMENDATION_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: SHIPPING_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: CHECKOUT_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: AD_SERVICE_ADDR
-            value: "localhost:1234"
-          - name: ENV_PLATFORM
-            value: "gcp"
-          - name: DISABLE_TRACING
-            value: "1"
-          - name: DISABLE_PROFILER
-            value: "1"
-          # - name: JAEGER_SERVICE_ADDR
-          #   value: "jaeger-collector:14268"
-          resources:
-            requests:
-              cpu: 100m
-              memory: 64Mi
-            limits:
-              cpu: 200m
-              memory: 128Mi
-        - name: caching-grpc-reverse-proxy
-          image: caching-grpc-reverse-proxy:latest
-          imagePullPolicy: Never
-          ports:
-          - containerPort: 1234
-          env:
-          - name: PROXY_LISTEN_PORT
-            value: "1234"
-          - name: TTL
-            value: "10000"
-          - name: PRODUCT_CATALOG_SERVICE_ADDR
             value: "productcatalogservice:3550"
           - name: CURRENCY_SERVICE_ADDR
             value: "currencyservice:7000"
@@ -332,8 +255,21 @@ spec:
             value: "checkoutservice:5050"
           - name: AD_SERVICE_ADDR
             value: "adservice:9555"
-          - name: PROXY_CACHE_BLACKLIST
-            value: "(AddItem|EmptyCart|ShipOrder|SendOrderConfirmation|PlaceOrder|Charge)"
+          - name: ENV_PLATFORM
+            value: "gcp"
+          # - name: DISABLE_TRACING
+          #   value: "1"
+          # - name: DISABLE_PROFILER
+          #   value: "1"
+          # - name: JAEGER_SERVICE_ADDR
+          #   value: "jaeger-collector:14268"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
 ---
 apiVersion: v1
 kind: Service
@@ -428,22 +364,20 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        # image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.2
-        image: pcs:latest
+        image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.2
         ports:
         - containerPort: 3550
         env:
         - name: PORT
           value: "3550"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
-        - name: DISABLE_PROFILER
-          value: "1"
+        # - name: DISABLE_STATS
+        #   value: "1"
+        # - name: DISABLE_TRACING
+        #   value: "1"
+        # - name: DISABLE_PROFILER
+        #   value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
-        imagePullPolicy: Never
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:3550"]
@@ -576,21 +510,19 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        # image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.2
-        image: cs:latest
+        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.2
         ports:
         - name: grpc
           containerPort: 7000
         env:
         - name: PORT
           value: "7000"
-        - name: DISABLE_TRACING
-          value: "1"
-        - name: DISABLE_PROFILER
-          value: "1"
-        - name: DISABLE_DEBUGGER
-          value: "1"
-        imagePullPolicy: Never
+        # - name: DISABLE_TRACING
+        #   value: "1"
+        # - name: DISABLE_PROFILER
+        #   value: "1"
+        # - name: DISABLE_DEBUGGER
+        #   value: "1"
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:7000"]
@@ -640,12 +572,12 @@ spec:
         env:
         - name: PORT
           value: "50051"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
-        - name: DISABLE_PROFILER
-          value: "1"
+        # - name: DISABLE_STATS
+        #   value: "1"
+        # - name: DISABLE_TRACING
+        #   value: "1"
+        # - name: DISABLE_PROFILER
+        #   value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
         readinessProbe:
@@ -752,10 +684,10 @@ spec:
         env:
         - name: PORT
           value: "9555"
-        - name: DISABLE_STATS
-          value: "1"
-        - name: DISABLE_TRACING
-          value: "1"
+        # - name: DISABLE_STATS
+        #   value: "1"
+        # - name: DISABLE_TRACING
+        #   value: "1"
         #- name: JAEGER_SERVICE_ADDR
         #  value: "jaeger-collector:14268"
         resources:

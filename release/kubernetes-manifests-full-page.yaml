@@ -270,6 +270,18 @@ spec:
             limits:
               cpu: 200m
               memory: 128Mi
+        - name: caching-http-reverse-proxy
+          image: caching-http-reverse-proxy:latest
+          imagePullPolicy: Never
+          ports:
+          - containerPort: 1234
+          env:
+          - name: PROXY_LISTEN_PORT
+            value: "1234"
+          - name: TTL
+            value: "10000"
+          - name: FRONTEND_ADDR
+            value: "localhost:8080"
 ---
 apiVersion: v1
 kind: Service
@@ -282,7 +294,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 8080
+    targetPort: 1234
 ---
 apiVersion: v1
 kind: Service
@@ -295,7 +307,7 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 8080
+    targetPort: 1234
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -364,7 +376,9 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.2
+        # image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.2
+        image: pcs:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 3550
         env:
@@ -510,7 +524,9 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: server
-        image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.2
+        # image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.2
+        image: cs:latest
+        imagePullPolicy: Never
         ports:
         - name: grpc
           containerPort: 7000

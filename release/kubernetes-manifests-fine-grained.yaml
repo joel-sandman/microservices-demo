@@ -430,6 +430,7 @@ spec:
       - name: server
         # image: gcr.io/google-samples/microservices-demo/productcatalogservice:v0.2.2
         image: pcs:latest
+        imagePullPolicy: Never
         ports:
         - containerPort: 3550
         env:
@@ -443,7 +444,6 @@ spec:
           value: "1"
         # - name: JAEGER_SERVICE_ADDR
         #   value: "jaeger-collector:14268"
-        imagePullPolicy: Never
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:3550"]
@@ -578,6 +578,7 @@ spec:
       - name: server
         # image: gcr.io/google-samples/microservices-demo/currencyservice:v0.2.2
         image: cs:latest
+        imagePullPolicy: Never
         ports:
         - name: grpc
           containerPort: 7000
@@ -590,7 +591,6 @@ spec:
           value: "1"
         - name: DISABLE_DEBUGGER
           value: "1"
-        imagePullPolicy: Never
         readinessProbe:
           exec:
             command: ["/bin/grpc_health_probe", "-addr=:7000"]

@@ -282,6 +282,8 @@ spec:
             value: "10000"
           - name: FRONTEND_ADDR
             value: "localhost:8080"
+          - name: PROXY_CACHE_BLACKLIST
+            value: "cart"
 ---
 apiVersion: v1
 kind: Service

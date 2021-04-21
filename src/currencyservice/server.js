@@ -182,7 +182,7 @@ async function updateCurrencyConversionRates() {
   const fs = require('fs');
   var loop = true;
   while (loop) {
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     _getCurrencyData((currencyData) => {
         for (let i in currencyData) {

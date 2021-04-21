@@ -333,7 +333,7 @@ type Price struct {
 func updateProductList() {
 	rand.Seed(time.Now().UTC().UnixNano())
 	for {
-		time.Sleep(10 * time.Second)
+		time.Sleep(5 * time.Second)
 		catalogMutex.Lock()
 		catalogJSON, _ := ioutil.ReadFile("products.json")
 

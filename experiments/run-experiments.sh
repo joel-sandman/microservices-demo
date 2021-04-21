@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-duration=60
+duration=600
 
 if [ ! -d results ]; then
     mkdir -p results
@@ -12,7 +12,7 @@ kubectl delete -f ../release/kubernetes-manifests-full-page.yaml &> /dev/null ||
 kubectl delete -f ../release/kubernetes-manifests-fine-grained.yaml &> /dev/null || true
 kubectl delete -f ../release/loadgenerator.yaml &> /dev/null || true
 
-for repetition in 1; do
+for repetition in {1..5}; do
     for experiment in full-page fine-grained; do
         for ttl in 0.1 0.2 0.5 1 2 5 10 20; do
             if grep 'end' results/${repetition}-${experiment}-${ttl}-times.txt; then

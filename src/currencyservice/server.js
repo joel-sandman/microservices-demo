@@ -104,7 +104,6 @@ function _getCurrencyData (callback) {
   fs.readFile('./data/currency_conversion.json', (err, data) => {
       if (err) throw err;
       let currencyData = JSON.parse(data);
-      // console.log(currencyData);
       callback(currencyData);
   });
 }
@@ -189,7 +188,6 @@ async function updateCurrencyConversionRates() {
           if (i == "EUR") {
             continue;
           }
-
           let factor = Math.random() * (1.0101 - 0.9900) + 0.9900;
           newRate = currencyData[i] * factor;
           currencyData[i] = newRate.toFixed(4).toString(10);

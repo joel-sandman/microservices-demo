@@ -136,7 +136,7 @@ spec:
           - name: PROXY_LISTEN_PORT
             value: "1234"
           - name: TTL
-            value: "10000"
+            value: "0"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
             value: "productcatalogservice:3550"
           - name: SHIPPING_SERVICE_ADDR
@@ -220,7 +220,7 @@ spec:
         - name: PROXY_LISTEN_PORT
           value: "1234"
         - name: TTL
-          value: "10000"
+          value: "0"
         - name: PRODUCT_CATALOG_SERVICE_ADDR
           value: "productcatalogservice:3550"
         - name: PROXY_CACHE_BLACKLIST
@@ -317,7 +317,7 @@ spec:
           - name: PROXY_LISTEN_PORT
             value: "1234"
           - name: TTL
-            value: "10000"
+            value: "0"
           - name: PRODUCT_CATALOG_SERVICE_ADDR
             value: "productcatalogservice:3550"
           - name: CURRENCY_SERVICE_ADDR

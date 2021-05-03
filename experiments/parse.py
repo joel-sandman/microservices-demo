@@ -151,6 +151,7 @@ def print_mean_data(methodology, service):
         total_size_of_stale_responses = []
         percentage_stale_of_cached = []
         percentage_stale_of_total = []
+        percentage_stale_of_total_size = []
         i = 0
         for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
             df = pd.read_csv(source)
@@ -178,6 +179,7 @@ def print_mean_data(methodology, service):
             if ttl > 0 and number_of_cached_responses[i] > 0:
                 percentage_stale_of_cached.append(number_of_stale_responses[i]/number_of_cached_responses[i])
                 percentage_stale_of_total.append(number_of_stale_responses[i]/number_of_requests[i])
+                percentage_stale_of_total_size.append(total_size_of_stale_responses[i]/total_size_of_all_network_traffic[i])
             i += 1
 
         print("Requests: " + str(mean(number_of_requests)))
@@ -204,6 +206,7 @@ def print_mean_data(methodology, service):
         if ttl > 0:
             print("Percentage stale of cached: " + str(mean(percentage_stale_of_cached)))
             print("Percentage stale of total: " + str(mean(percentage_stale_of_total)))
+            print("Percentage stale of total size: " + str(mean(percentage_stale_of_total_size)))
         print("")
 
         print("")

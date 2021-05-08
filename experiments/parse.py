@@ -8,8 +8,8 @@ def normalize_timestamps(df):
     df['timestamp'] = df['timestamp'] - df['timestamp'][0]
     return df
 
-def get_network_traffic(methodology, service):
-    requests_vs_ttl = []
+def get_network_traffic_by_requests(methodology, service):
+    network_traffic_by_requests = []
     for ttl in [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
         network_traffic_requests = []
         for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
@@ -19,8 +19,8 @@ def get_network_traffic(methodology, service):
             number_of_cached_responses = len(cached_network_traffic)
             number_of_non_cached_requests = number_of_requests - number_of_cached_responses
             network_traffic_requests.append(number_of_non_cached_requests)
-        requests_vs_ttl.append((ttl, mean(network_traffic_requests)))
-    return requests_vs_ttl
+        network_traffic_by_requests.append(mean(network_traffic_requests))
+    return network_traffic_by_requests
 
 def get_network_traffic_reduction_by_requests(methodology, service):
     network_traffic_reduction_by_requests = []

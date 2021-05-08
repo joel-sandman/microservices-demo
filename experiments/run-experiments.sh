@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-duration=900
+duration=600
 
 if [ ! -d results ]; then
     mkdir -p results

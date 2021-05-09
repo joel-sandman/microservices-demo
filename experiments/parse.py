@@ -4,10 +4,6 @@ import glob
 import pandas as pd
 from statistics import mean
 
-def normalize_timestamps(df):
-    df['timestamp'] = df['timestamp'] - df['timestamp'][0]
-    return df
-
 def get_network_traffic_by_requests(methodology, service):
     network_traffic_by_requests = []
     for ttl in [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:

@@ -97,7 +97,7 @@ def get_memory_usage(methodology, service):
                 sizes.append(60)
             sizes = sizes[:300]
             corrected_sizes = [x-60 for x in sizes]
-            memory_usage.append(mean(corrected_sizes))
+            memory_usage.append(mean(corrected_sizes)/1000)
         mean_memory_usage.append(mean(memory_usage))
     return mean_memory_usage
 

@@ -22,56 +22,71 @@ def get_network_traffic_by_requests(methodology, service):
         network_traffic_by_requests.append(mean(network_traffic_requests))
     return network_traffic_by_requests
 
-def get_network_traffic_reduction_by_requests(methodology, service):
-    network_traffic_reduction_by_requests = []
-    for ttl in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
-        network_traffic_reduction = []
-        for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
-            df = pd.read_csv(source)
-            number_of_requests = len(df)
-            cached_network_traffic = df.loc[df['source'] == 'cache']
-            number_of_cached_responses = len(cached_network_traffic)
-            network_traffic_reduction.append(number_of_cached_responses/number_of_requests)
-        network_traffic_reduction_by_requests.append(mean(network_traffic_reduction))
-    return network_traffic_reduction_by_requests
-
-def get_network_traffic_reduction_by_size(methodology, service):
-    network_traffic_reduction_by_size = []
-    for ttl in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
-        network_traffic_reduction = []
+def get_network_traffic_by_size(methodology, service):
+    network_traffic_by_size = []
+    for ttl in [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
+        network_traffic_size = []
         for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
             df = pd.read_csv(source)
             total_size_of_all_network_traffic = df['size'].sum()
             cached_network_traffic = df.loc[df['source'] == 'cache']
             total_size_of_cached_network_traffic = cached_network_traffic['size'].sum()
-            network_traffic_reduction.append(total_size_of_cached_network_traffic/total_size_of_all_network_traffic)
-        network_traffic_reduction_by_size.append(mean(network_traffic_reduction))
+            size_of_non_cached_requests = total_size_of_all_network_traffic - total_size_of_cached_network_traffic
+            network_traffic_size.append(size_of_non_cached_requests/(1000*1000))
+        network_traffic_by_size.append(mean(network_traffic_size))
+    return network_traffic_by_size
+
+def get_network_traffic_reduction_by_requests(methodology, service):
+    network_traffic_reduction_by_requests = []
+    for ttl in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
+        number_of_requests = []
+        number_of_cached_responses = []
+        for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
+            df = pd.read_csv(source)
+            number_of_requests.append(len(df))
+            cached_network_traffic = df.loc[df['source'] == 'cache']
+            number_of_cached_responses.append(len(cached_network_traffic))
+        network_traffic_reduction_by_requests.append(sum(number_of_cached_responses)/sum(number_of_requests))
+    return network_traffic_reduction_by_requests
+
+def get_network_traffic_reduction_by_size(methodology, service):
+    network_traffic_reduction_by_size = []
+    for ttl in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
+        total_size_of_all_network_traffic = []
+        total_size_of_cached_network_traffic = []
+        for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
+            df = pd.read_csv(source)
+            total_size_of_all_network_traffic.append(df['size'].sum())
+            cached_network_traffic = df.loc[df['source'] == 'cache']
+            total_size_of_cached_network_traffic.append(cached_network_traffic['size'].sum())
+        network_traffic_reduction_by_size.append(sum(total_size_of_cached_network_traffic)/sum(total_size_of_all_network_traffic))
     return network_traffic_reduction_by_size
 
 def get_data_staleness_by_requests(methodology, service):
     data_staleness_by_requests = []
     for ttl in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
-        data_staleness = []
+        number_of_requests = []
+        number_of_stale_responses = []
         for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
             df = pd.read_csv(source)
-            number_of_requests = len(df)
+            number_of_requests.append(len(df))
             stale_responses = df.loc[df['info'] == 'stale']
-            number_of_stale_responses = len(stale_responses)
-            data_staleness.append(number_of_stale_responses/number_of_requests)
-        data_staleness_by_requests.append(mean(data_staleness))
+            number_of_stale_responses.append(len(stale_responses))
+        data_staleness_by_requests.append(sum(number_of_stale_responses)/sum(number_of_requests))
     return data_staleness_by_requests
 
 def get_data_staleness_by_size(methodology, service):
     data_staleness_by_size = []
     for ttl in [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]:
-        data_staleness = []
+        total_size_of_all_network_traffic = []
+        total_size_of_stale_responses = []
         for source in glob.glob('results/?-' + methodology + '-' + str(ttl) + '-' + service + '-caching.csv'):
             df = pd.read_csv(source)
-            total_size_of_all_network_traffic = df['size'].sum()
+            total_size_of_all_network_traffic.append(df['size'].sum())
             stale_responses = df.loc[df['info'] == 'stale']
-            total_size_of_stale_responses = stale_responses['size'].sum()
-            data_staleness.append(total_size_of_stale_responses/total_size_of_all_network_traffic)
-        data_staleness_by_size.append(mean(data_staleness))
+            total_size_of_stale_responses.append(stale_responses['size'].sum())
+            # data_staleness.append(total_size_of_stale_responses/total_size_of_all_network_traffic)
+        data_staleness_by_size.append(sum(total_size_of_stale_responses)/sum(total_size_of_all_network_traffic))
     return data_staleness_by_size
 
 def get_memory_usage(methodology, service):

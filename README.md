@@ -1,3 +1,10 @@
+# Online Boutique - Microservices Demo Application
+This repo contains modifications of the Online Boutique for the thesis "Evaluation of Caching Methodologies for Microservice-Based Architectures in Kubernetes". Information about how to run the experiments for that thesis are found in the [README](experiments/README.md) in the `experiments/` directory.
+
+What has been changed to the Online Boutique is that the Currency Service and Product Catalog Service updates their data with predefined frequencies.
+
+**The original README is found below.**
+
 <p align="center">
 <img src="src/frontend/static/icons/Hipster_HeroLogoCyan.svg" width="300" alt="Online Boutique" />
 </p>

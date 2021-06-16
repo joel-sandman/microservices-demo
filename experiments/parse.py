@@ -81,7 +81,6 @@ def get_data_staleness_by_size(methodology, service):
             total_size_of_all_network_traffic.append(df['size'].sum())
             stale_responses = df.loc[df['info'] == 'stale']
             total_size_of_stale_responses.append(stale_responses['size'].sum())
-            # data_staleness.append(total_size_of_stale_responses/total_size_of_all_network_traffic)
         data_staleness_by_size.append(sum(total_size_of_stale_responses)/sum(total_size_of_all_network_traffic))
     return data_staleness_by_size
 
